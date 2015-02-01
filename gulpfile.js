@@ -48,6 +48,13 @@ gulp.task('jshint', function () {
     .pipe($.jshint.reporter('jshint-stylish'))
     .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
 });
+//Build JavaScript
+gulp.task('jsbuild', function () {
+  return gulp.src(['app/js/vendor/*.js','app/js/modules/*.js', 'app/js/main.js'])
+    .pipe($.uglify({preserveComments: 'some'}))
+    .pipe($.concat('js/all.min.js'))
+    .pipe(gulp.dest('./dist/'))
+});
 
 // Optimize Images
 gulp.task('images', function () {
@@ -108,11 +115,10 @@ gulp.task('html', function () {
 
   return gulp.src('app/**/*.html')
     .pipe(assets)
-    // Concatenate And Minify JavaScript
+    // Minify JavaScript
     .pipe($.if('*.js', $.uglify({preserveComments: 'some'})))
+
     // Remove Any Unused CSS
-    // Note: If not using the Style Guide, you can delete it from
-    // the next line to only include styles your project uses.
     .pipe($.if('*.css', $.uncss({
       html: [
         'app/index.html'
