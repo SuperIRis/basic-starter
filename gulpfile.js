@@ -63,7 +63,7 @@ gulp.task('images', function () {
       progressive: true,
       interlaced: true
     })))
-    .pipe(gulp.dest('dist/images'))
+    .pipe(gulp.dest('./dist/images'))
     .pipe($.size({title: 'images'}));
 });
 
@@ -190,6 +190,11 @@ gulp.task('pagespeed', pagespeed.bind(null, {
   url: 'https://example.com',
   strategy: 'mobile'
 }));
+
+//clear file cache
+gulp.task('clear', function (done) {
+  return $.cache.clearAll(done);
+});
 
 // Load custom tasks from the `tasks` directory
 try { require('require-dir')('tasks'); } catch (err) {}
