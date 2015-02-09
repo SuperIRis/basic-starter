@@ -25,33 +25,15 @@ body {
   font-weight: 300; // to thicken it a bit, we need to remove font-smoothing
   color: $colorText;
 
-  @include baseline-grid();
+  //@include baseline-grid();
 }
 
 pre {
-  background: $colorGrayBackground;
+  background: $colorText;
   padding: 13px;
 }
 
-.main-container {
-  @include container(true);
-}
 
-.container {
-  @include container(true);
-}
-
-.container-medium {
-  @include medium {
-    @include container(true);
-  }
-}
-
-.container-small {
-  @include small-only {
-    @include container(true);
-  }
-}
 
 .content {
   @include wide {

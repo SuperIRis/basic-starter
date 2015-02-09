@@ -1,32 +1,19 @@
-/**
- *
- *  Web Starter Kit
- *  Copyright 2014 Google Inc. All rights reserved.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License
- *
- */
-
 'use strict';
 
 // Include Gulp & Tools We'll Use
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
+var browserify = require('browserify');
+var source = require('vinyl-source-stream');
+var buffer = require('vinyl-buffer');
+var sass = require('gulp-ruby-sass');
 var del = require('del');
 var runSequence = require('run-sequence');
 var browserSync = require('browser-sync');
 var pagespeed = require('psi');
 var reload = browserSync.reload;
+var fs = require('fs');
+
 
 var AUTOPREFIXER_BROWSERS = [
   'ie >= 10',
@@ -40,6 +27,26 @@ var AUTOPREFIXER_BROWSERS = [
   'bb >= 10'
 ];
 
+//Browserify
+gulp.task('browserify-serve', function(){   
+  
+  return browserify('./app/js/main.js')
+    .bundle()
+    .pipe(source('bundle.js'))
+    .pipe(buffer())
+    .pipe($.uglify())
+    .pipe(gulp.dest('./app/js/'));
+});
+gulp.task('browserify', function(){   
+  
+  return browserify('./app/js/main.js')
+    .bundle()
+    .pipe(source('bundle.js'))
+    .pipe(buffer())
+    .pipe($.uglify())
+    .pipe(gulp.dest('./dist/js/'));
+});
+
 // Lint JavaScript
 gulp.task('jshint', function () {
   return gulp.src('app/js/**/*.js')
@@ -48,14 +55,6 @@ gulp.task('jshint', function () {
     .pipe($.jshint.reporter('jshint-stylish'))
     .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
 });
-//Build JavaScript
-gulp.task('jsbuild', function () {
-  return gulp.src(['app/js/vendor/*.js','app/js/modules/*.js', 'app/js/main.js'])
-    .pipe($.uglify({preserveComments: 'some'}))
-    .pipe($.concat('js/all.min.js'))
-    .pipe(gulp.dest('./dist/'))
-});
-
 // Optimize Images
 gulp.task('images', function () {
   return gulp.src('app/images/**/*')
@@ -89,15 +88,12 @@ gulp.task('fonts', function () {
 // Compile and Automatically Prefix Stylesheets
 gulp.task('css', function () {
   // For best performance, don't add Sass partials to `gulp.src`
-  return gulp.src([
-      'app/css/*.scss',
-      'app/css/**/*.css',
-      'app/css/modules/modules.scss'
-    ])
-    .pipe($.changed('css', {extension: '.scss'}))
-    .pipe($.compass({
-        style: 'expanded',
-        precision: 10
+  return gulp.src(
+      'app/sass/main.scss'
+    )
+    //.pipe($.changed('css', {extension: '.scss'}))
+    .pipe(sass({
+        compass:true
       })
       .on('error', console.error.bind(console))
     )
@@ -116,7 +112,7 @@ gulp.task('html', function () {
   return gulp.src('app/**/*.html')
     .pipe(assets)
     // Minify JavaScript
-    .pipe($.if('*.js', $.uglify({preserveComments: 'some'})))
+    //.pipe($.if('*.js', $.uglify({preserveComments: 'some'})))
 
     // Remove Any Unused CSS
     .pipe($.if('*.css', $.uncss({
@@ -147,7 +143,7 @@ gulp.task('html', function () {
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
 // Watch Files For Changes & Reload
-gulp.task('serve', ['css'], function () {
+gulp.task('serve', ['css', 'browserify-serve'], function () {
   browserSync({
     notify: false,
     // Run as an https by uncommenting 'https: true'
@@ -177,7 +173,7 @@ gulp.task('serve:dist', ['default'], function () {
 
 // Build Production Files, the Default Task
 gulp.task('default', ['clean'], function (cb) {
-  runSequence('css', ['jshint', 'html', 'images', 'fonts', 'copy'], cb);
+  runSequence('css', ['browserify', 'html', 'images', 'fonts', 'copy'], cb);
 });
 
 // Run PageSpeed Insights

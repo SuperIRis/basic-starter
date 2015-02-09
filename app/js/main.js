@@ -1,4 +1,6 @@
 "use strict";
 ;(function(){
-  console.log("Hello world!");
+	var tester = require("./modules/test-module.js");
+	tester();
+	console.log("Hello world!");
 })();
