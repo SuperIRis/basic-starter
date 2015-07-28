@@ -49,7 +49,7 @@ gulp.task('browserify', function(){
 
 // Lint JavaScript
 gulp.task('jshint', function () {
-  return gulp.src('app/js/**/*.js')
+  return gulp.src(['app/js/**/*.js', '!app/js/vendor/*.js', '!app/js/bundle.js'])
     .pipe(reload({stream: true, once: true}))
     .pipe($.jshint())
     .pipe($.jshint.reporter('jshint-stylish'))
@@ -93,7 +93,7 @@ gulp.task('css', function () {
     )
     //.pipe($.changed('css', {extension: '.scss'}))
     .pipe(sass({
-        compass:true
+        compass:false
       })
       .on('error', console.error.bind(console))
     )
@@ -104,7 +104,24 @@ gulp.task('css', function () {
     .pipe(gulp.dest('dist/css'))
     .pipe($.size({title: 'css'}));
 });
-
+gulp.task('css-serve', function () {
+  // For best performance, don't add Sass partials to `gulp.src`
+  return gulp.src(
+      'app/sass/main.scss'
+    )
+    //.pipe($.changed('css', {extension: '.scss'}))
+    .pipe(sass({
+        compass:false
+      })
+      .on('error', console.error.bind(console))
+    )
+    .pipe($.autoprefixer(AUTOPREFIXER_BROWSERS))
+    .pipe(gulp.dest('.tmp/css'))
+    // Concatenate And Minify Styles
+    .pipe($.if('*.css', $.csso()))
+    .pipe(gulp.dest('app/css'))
+    .pipe($.size({title: 'css'}));
+});
 // Scan Your HTML For Assets & Optimize Them
 gulp.task('html', function () {
   var assets = $.useref.assets({searchPath: '{.tmp,app}'});
@@ -143,7 +160,7 @@ gulp.task('html', function () {
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
 // Watch Files For Changes & Reload
-gulp.task('serve', ['css', 'browserify-serve'], function () {
+gulp.task('serve', ['browserify-serve', 'css-serve'], function () {
   browserSync({
     notify: false,
     // Run as an https by uncommenting 'https: true'
@@ -154,8 +171,8 @@ gulp.task('serve', ['css', 'browserify-serve'], function () {
   });
 
   gulp.watch(['app/**/*.html'], reload);
-  gulp.watch(['app/css/**/*.{scss,css}'], ['css', reload]);
-  gulp.watch(['app/js/**/*.js'], ['jshint']);
+  gulp.watch(['app/sass/**/*.{scss,css}'], ['css-serve', reload]);
+  gulp.watch(['app/js/**/*.js'], ['browserify-serve', 'jshint']);
   gulp.watch(['app/images/**/*'], reload);
 });
 
