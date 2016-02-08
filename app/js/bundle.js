@@ -1,1 +1,12 @@
-!function r(e,o,t){function n(i,f){if(!o[i]){if(!e[i]){var s="function"==typeof require&&require;if(!f&&s)return s(i,!0);if(u)return u(i,!0);var l=new Error("Cannot find module '"+i+"'");throw l.code="MODULE_NOT_FOUND",l}var c=o[i]={exports:{}};e[i][0].call(c.exports,function(r){var o=e[i][1][r];return n(o?o:r)},c,c.exports,r,e,o,t)}return o[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)n(t[i]);return n}({1:[function(r){"use strict";!function(){var e=r("./modules/test-module.js");e(),console.log("Hello world!")}()},{"./modules/test-module.js":2}],2:[function(r,e){e.exports=function(){console.log("testing...")}},{}]},{},[1]);
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+"use strict";
+;(function(){
+	var tester = require("./modules/test-module.js");
+	tester();
+	console.log("Hello world!");
+})();
+},{"./modules/test-module.js":2}],2:[function(require,module,exports){
+module.exports = function(){
+	console.log("testing...");
+}
+},{}]},{},[1]);
